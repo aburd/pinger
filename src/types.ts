@@ -1,5 +1,6 @@
 export type UrlItem = {
   id: number;
+  name: string;
   url: string;
   intervalMs: number;
   timeoutM: number;

@@ -1,0 +1,9 @@
+.ping-item {
+  width: 100%;
+  padding: 0.2rem;
+  border-radius: 5px;
+}
+
+.PingList .controls {
+  margin-bottom: 0.5rem;
+}

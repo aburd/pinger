@@ -1,8 +1,9 @@
-import {createEffect, createSignal, For, Show} from "solid-js";
+import {createEffect, createSignal, Show} from "solid-js";
 import {createStore} from "solid-js/store";
-import {Grid, GridItem, Heading, Button} from "@hope-ui/solid"
+import {Grid, GridItem, Heading} from "@hope-ui/solid"
 import PingDetails from '../components/PingDetails'
 import PingResults from '../components/PingResults'
+import PingList from '../components/PingList'
 import * as api from '../api'
 import {UrlItem, PingResult} from '../types';
 
@@ -50,8 +51,10 @@ function Home() {
   }
 
   function handleAddNewUrlItem() {
+    const id = urls.length + 1;
     const item = {
-      id: urls.length + 1,
+      id,
+      name: id.toString(),
       url: "https://",
       intervalMs: 1000,
       timeoutM: 0.1,
@@ -78,16 +81,14 @@ function Home() {
       <GridItem rowSpan={1} colSpan={5} bg="whitesmoke" padding="$2">
         <Heading size="6xl">Pinger</Heading>
       </GridItem>
-      <GridItem rowSpan={9} colSpan={1} bg="papayawhip" padding="$2">
-        <Heading size="xl">URLs</Heading>
-        <Button size="xs" onClick={() => handleAddNewUrlItem()}>Add new Url</Button>
-        <ul>
-          <For each={urls}>
-            {(item) => <li onClick={() => handleUrlClick(item)}>{item.url}</li>}
-          </For>
-        </ul>
+      <GridItem rowSpan={9} colSpan={1} bg="tomato" padding="$2">
+        <PingList 
+          pings={urls}
+          onAdd={handleAddNewUrlItem}
+          onClickItem={(ping) => handleUrlClick(ping)}
+        />
       </GridItem>
-      <GridItem rowSpan={9} colSpan={2} bg="tomato" padding="$2">
+      <GridItem rowSpan={9} colSpan={2} bg="papayawhip" padding="$2">
         <Show when={currentUrl()} fallback={<Heading>No URL selected</Heading>}>
           <PingDetails
             url={currentUrl() as UrlItem}
@@ -97,8 +98,8 @@ function Home() {
           />
         </Show>
       </GridItem>
-      <GridItem rowSpan={9} colSpan={2} bg="tomato" padding="$2">
-        <Show when={currentUrl()}> 
+      <GridItem rowSpan={9} colSpan={2} bg="papayawhip" padding="$2">
+        <Show when={currentUrl()}>
           <PingResults
             results={pingResults}
           />

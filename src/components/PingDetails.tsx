@@ -24,6 +24,14 @@ function PingDetails(props: Props) {
       <Heading size="xl">Ping a url</Heading>
       <div>
         <FormControl>
+          <FormLabel for="name">Name</FormLabel>
+          <Input id="name" type="text"
+            onChange={(e) => props.onChange({...props.url, name: e.currentTarget.value})}
+            value={props.url.name}
+          />
+          <FormHelperText>{"A name for this ping"}</FormHelperText>
+        </FormControl>
+        <FormControl>
           <FormLabel for="url">URL</FormLabel>
           <Input id="url" type="text"
             onChange={(e) => props.onChange({...props.url, url: e.currentTarget.value})}

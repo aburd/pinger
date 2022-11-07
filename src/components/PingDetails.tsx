@@ -1,5 +1,5 @@
 import {createSignal, Show} from "solid-js"
-import {Text, Heading, Button, FormControl, Divider, FormLabel, Input, FormHelperText} from "@hope-ui/solid"
+import {Text, Heading, Button, FormControl, FormLabel, Input, FormHelperText} from "@hope-ui/solid"
 import {UrlItem} from '../types'
 
 interface Props {
@@ -57,7 +57,6 @@ function PingDetails(props: Props) {
           </Button>
         </Show>
       </div>
-      <Divider />
     </div>
   )
 }

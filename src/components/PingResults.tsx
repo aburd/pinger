@@ -42,6 +42,9 @@ function PingResults(props: Props) {
                       <Show when={!!item.status}>
                         <Badge colorScheme="info">{item.status}</Badge>
                       </Show>
+                      <Show when={!!item.url}>
+                        <Text>URL: {item.url}</Text>
+                      </Show>
                       <Text noOfLines={openLog(i()) ? Infinity : 2}>
                         {item.text}
                       </Text>

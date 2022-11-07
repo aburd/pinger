@@ -4,6 +4,7 @@ import {PingResult} from '../types'
 interface PingResponse {
   status: string,
   text: string,
+  url: string,
 }
 
 export async function ping(url: string): Promise<PingResult> {
@@ -16,6 +17,7 @@ export async function ping(url: string): Promise<PingResult> {
   } catch (e) {
     return {
       text: (e as Error).toString(),
+      url: null, 
       level: "error",
     }
   }

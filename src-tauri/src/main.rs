@@ -9,11 +9,12 @@ use serde::Serialize;
 struct PingResponse {
     status: String,
     text: String,
+    url: String,
 }
 
 impl PingResponse {
-    fn new(status: String, text: String) -> Self {
-        PingResponse { status, text }
+    fn new(status: String, text: String, url: String) -> Self {
+        PingResponse { status, text, url }
     }
 }
 
@@ -22,8 +23,9 @@ fn client_ping(url: &str) -> Result<PingResponse, String> {
     let response = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
 
     let status = response.status().to_string();
+    let url = response.url().to_string();
     let text = response.text().map_err(|e| e.to_string())?;
-    Ok(PingResponse::new(status, text))
+    Ok(PingResponse::new(status, text, url))
 }
 
 fn main() {

@@ -2,7 +2,7 @@ export type UrlItem = {
   id: number;
   url: string;
   intervalMs: number;
-  timeoutMs: number;
+  timeoutM: number;
 }
 
 export interface PingResult {

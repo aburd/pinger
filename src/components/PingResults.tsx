@@ -29,7 +29,7 @@ function PingResults(props: Props) {
 
   return (
     <div class="PingResults">
-      <Heading>Results</Heading>
+      <Heading size="xl">Results</Heading>
       <Container>
         <Show when={props.results.length} fallback={<p>No results.</p>}>
           <ul>

@@ -31,7 +31,7 @@ function Home() {
     const selected = currentUrl();
     if (!selected) return;
 
-    setTimeoutMs(selected.timeoutMs);
+    setTimeoutMs(selected.timeoutM * 60 * 1000);
     intervalRef = setInterval(() => {
       ping();
       setTimeoutMs(timeoutMs() - selected.intervalMs);
@@ -54,7 +54,7 @@ function Home() {
       id: urls.length + 1,
       url: "https://",
       intervalMs: 1000,
-      timeoutMs: 5000,
+      timeoutM: 0.1,
     }
     setUrls([
       ...urls,
@@ -74,13 +74,12 @@ function Home() {
       class="page"
       templateRows="repeat(10, 1fr)"
       templateColumns="repeat(5, 1fr)"
-      // gap="$1"
     >
       <GridItem rowSpan={1} colSpan={5} bg="whitesmoke" padding="$2">
-        <Heading>Pinger</Heading>
+        <Heading size="5xl">Pinger</Heading>
       </GridItem>
       <GridItem rowSpan={9} colSpan={1} bg="papayawhip" padding="$2">
-        <Heading>URLs</Heading>
+        <Heading size="xl">URLs</Heading>
         <Button size="xs" onClick={() => handleAddNewUrlItem()}>Add new Url</Button>
         <ul>
           <For each={urls}>

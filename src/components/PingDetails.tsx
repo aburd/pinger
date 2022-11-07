@@ -1,5 +1,5 @@
-import {Show} from "solid-js"
-import {Container, Heading, Button, FormControl, Divider, FormLabel, Input, FormHelperText} from "@hope-ui/solid"
+import {createSignal, Show} from "solid-js"
+import {Text, Heading, Button, FormControl, Divider, FormLabel, Input, FormHelperText} from "@hope-ui/solid"
 import {UrlItem} from '../types'
 
 interface Props {
@@ -10,9 +10,18 @@ interface Props {
 }
 
 function PingDetails(props: Props) {
+  const [nowDate, setNowDate] = createSignal(new Date(), { equals: false });
+  function addDate(deltaMs: number) {
+    const now = new Date();
+    return new Date(now.valueOf() + deltaMs);
+  }
+  setInterval(() => {
+    const delta = props.url.timeoutM * 60 * 1000;
+    setNowDate(addDate(delta));
+  }, 1000);
   return (
     <div class="PingDetails">
-      <Heading>Ping a url</Heading>
+      <Heading size="xl">Ping a url</Heading>
       <div>
         <FormControl>
           <FormLabel for="url">URL</FormLabel>
@@ -20,7 +29,6 @@ function PingDetails(props: Props) {
             onChange={(e) => props.onChange({...props.url, url: e.currentTarget.value})}
             value={props.url.url}
           />
-          <FormHelperText>{"Helper text"}</FormHelperText>
         </FormControl>
         <Button type="button" onClick={() => props.onSubmitPing()}>
           Ping Once
@@ -30,19 +38,20 @@ function PingDetails(props: Props) {
           <FormControl>
             <FormLabel for="interval">Interval</FormLabel>
             <Input id="interval" type="number"
-              onChange={(e) => props.onChange({...props.url, intervalMs: Number(e.currentTarget.value)})} 
+              onChange={(e) => props.onChange({...props.url, intervalMs: Number(e.currentTarget.value)})}
               value={props.url.intervalMs}
             />
-            <FormHelperText>{"In milliseconds"}</FormHelperText>
+            <FormHelperText>{"How often to ping for in ms"}</FormHelperText>
           </FormControl>
           <FormControl>
             <FormLabel for="timeout">Timeout</FormLabel>
             <Input id="timeout" type="number"
-              onChange={(e) => props.onChange({...props.url, timeoutMs: Number(e.currentTarget.value)})} 
-              value={props.url.timeoutMs}
+              onChange={(e) => props.onChange({...props.url, timeoutM: Number(e.currentTarget.value)})}
+              value={props.url.timeoutM}
             />
-            <FormHelperText>{"In milliseconds"}</FormHelperText>
+            <FormHelperText>{"How long to ping for in minutes"}</FormHelperText>
           </FormControl>
+          <Text>This will ping until {nowDate().toLocaleTimeString()}</Text>
           <Button type="button" onClick={() => props.onSubmitPingRepeat()}>
             Ping Repeat
           </Button>

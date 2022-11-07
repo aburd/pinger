@@ -4,8 +4,7 @@ import {UrlItem} from '../types'
 
 interface Props {
   url: UrlItem;
-  onUrlChange: (id: number, text: string) => void;
-  onIntervalChange?: (id: number, timeMs: number) => void;
+  onChange: (item: UrlItem) => void;
   onSubmitPing: () => void;
   onSubmitPingRepeat: () => void;
 }
@@ -18,7 +17,7 @@ function PingDetails(props: Props) {
         <FormControl>
           <FormLabel for="url">URL</FormLabel>
           <Input id="url" type="text"
-            onChange={(e) => props.onUrlChange(props.url.id, e.currentTarget.value)}
+            onChange={(e) => props.onChange({...props.url, url: e.currentTarget.value})}
             value={props.url.url}
           />
           <FormHelperText>{"Helper text"}</FormHelperText>
@@ -31,10 +30,18 @@ function PingDetails(props: Props) {
           <FormControl>
             <FormLabel for="interval">Interval</FormLabel>
             <Input id="interval" type="number"
-              onChange={(e) => props.onIntervalChange && props.onIntervalChange(props.url.id, Number(e.currentTarget.value))}
+              onChange={(e) => props.onChange({...props.url, intervalMs: Number(e.currentTarget.value)})} 
               value={props.url.intervalMs}
             />
-            <FormHelperText>{"Time is in milliseconds"}</FormHelperText>
+            <FormHelperText>{"In milliseconds"}</FormHelperText>
+          </FormControl>
+          <FormControl>
+            <FormLabel for="timeout">Timeout</FormLabel>
+            <Input id="timeout" type="number"
+              onChange={(e) => props.onChange({...props.url, timeoutMs: Number(e.currentTarget.value)})} 
+              value={props.url.timeoutMs}
+            />
+            <FormHelperText>{"In milliseconds"}</FormHelperText>
           </FormControl>
           <Button type="button" onClick={() => props.onSubmitPingRepeat()}>
             Ping Repeat

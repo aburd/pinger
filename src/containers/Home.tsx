@@ -1,4 +1,4 @@
-import {createSignal, For, Show} from "solid-js";
+import {createEffect, createSignal, For, Show} from "solid-js";
 import {createStore} from "solid-js/store";
 import {Grid, GridItem, Divider, Heading, Button} from "@hope-ui/solid"
 import PingDetails from '../components/PingDetails'
@@ -6,8 +6,11 @@ import PingResults from '../components/PingResults'
 import * as api from '../api'
 import {UrlItem, PingResult} from '../types';
 
+let intervalRef: NodeJS.Timer | null = null;
+
 function Home() {
   const [pingResults, setPingMsgs] = createStore<PingResult[]>([]);
+  const [timeoutMs, setTimeoutMs] = createSignal<number>(0);
   const [url, setUrl] = createSignal<number | null>(null);
   const [urls, setUrls] = createStore<UrlItem[]>([]);
 
@@ -24,6 +27,23 @@ function Home() {
     setPingMsgs([res, ...pingResults]);
   }
 
+  function pingRepeat() {
+    const selected = currentUrl();
+    if (!selected) return;
+
+    setTimeoutMs(selected.timeoutMs);
+    intervalRef = setInterval(() => {
+      ping();
+      setTimeoutMs(timeoutMs() - selected.intervalMs);
+    }, selected.intervalMs); 
+  }
+
+  createEffect(() => {
+    if (timeoutMs() <= 0 && intervalRef) {
+      clearInterval(intervalRef);
+    }
+  });
+
   function handleUrlClick(url: UrlItem) {
     setUrl(url.id);
     setPingMsgs([]);
@@ -34,7 +54,7 @@ function Home() {
       id: urls.length + 1,
       url: "https://",
       intervalMs: 1000,
-      timeoutMs: 60000,
+      timeoutMs: 5000,
     }
     setUrls([
       ...urls,
@@ -44,8 +64,8 @@ function Home() {
     setPingMsgs([]);
   }
 
-  function updateUrl(id: number, text: string) {
-    setUrls(u => u.id == id, "url", text);
+  function handleUrlChange(url: UrlItem) {
+    setUrls(u => u.id == url.id, url); 
   }
 
   return (
@@ -54,27 +74,27 @@ function Home() {
       class="page"
       templateRows="repeat(10, 1fr)"
       templateColumns="repeat(5, 1fr)"
-      gap="$4"
+      // gap="$1"
     >
-      <GridItem rowSpan={1} colSpan={5} bg="papayawhip">
+      <GridItem rowSpan={1} colSpan={5} bg="whitesmoke" padding="$2">
         <Heading>Pinger</Heading>
       </GridItem>
-      <GridItem rowSpan={9} colSpan={1} bg="papayawhip">
+      <GridItem rowSpan={9} colSpan={1} bg="papayawhip" padding="$2">
         <Heading>URLs</Heading>
-        <Button onClick={() => handleAddNewUrlItem()}>Add new Url</Button>
+        <Button size="xs" onClick={() => handleAddNewUrlItem()}>Add new Url</Button>
         <ul>
           <For each={urls}>
             {(item) => <li onClick={() => handleUrlClick(item)}>{item.url}</li>}
           </For>
         </ul>
       </GridItem>
-      <GridItem rowSpan={9} colSpan={4} bg="tomato">
+      <GridItem rowSpan={9} colSpan={4} bg="tomato" padding="$2">
         <Show when={currentUrl()} fallback={<Heading>No URL selected</Heading>}>
           <PingDetails
             url={currentUrl() as UrlItem}
+            onChange={handleUrlChange}
             onSubmitPing={() => ping()}
-            onSubmitPingRepeat={() => ping()}
-            onUrlChange={updateUrl}
+            onSubmitPingRepeat={() => pingRepeat()}
           />
           <Divider />
           <PingResults

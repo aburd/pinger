@@ -1,4 +1,4 @@
-import {createMemo, createEffect, createSignal, Show, For, Switch, Match} from "solid-js"
+import {createSignal, Show, For, Switch, Match} from "solid-js"
 import {Container, Heading, Text, Badge} from "@hope-ui/solid"
 import {PingResult} from '../types'
 import './PingResults.css'
@@ -6,12 +6,6 @@ import './PingResults.css'
 interface Props {
   results: PingResult[];
 }
-
-// <Badge colorScheme="primary">Badge</Badge>
-// <Badge colorScheme="accent">Badge</Badge>
-// <Badge colorScheme="neutral">Badge</Badge>
-// <Badge colorScheme="info">Badge</Badge>
-// <Badge colorScheme="warning">Badge</Badge>
 
 function PingResults(props: Props) {
   const [openItems, setOpenItems] = createSignal<number[]>([]);
@@ -40,29 +34,27 @@ function PingResults(props: Props) {
         <Show when={props.results.length} fallback={<p>No results.</p>}>
           <ul>
             <For each={props.results}>
-              {(item, i) => {
-                return (
-                  <li onclick={() => handleLogClick(i())}>
-                    <Switch>
-                      <Match when={item.level === "log"}>
-                        <Badge colorScheme="success">log</Badge>
-                        <Show when={!!item.status}>
-                          <Badge colorScheme="info">{item.status}</Badge>
-                        </Show>
-                        <Text noOfLines={openLog(i()) ? Infinity : 2}>
-                          {item.text}
-                        </Text>
-                      </Match>
-                      <Match when={item.level === "error"}>
-                        <Badge colorScheme="danger">err</Badge>
-                        <Text>
-                          {item.text}
-                        </Text>
-                      </Match>
-                    </Switch>
-                  </li>
-                )
-              }}
+              {(item, i) => (
+                <li onclick={() => handleLogClick(i())}>
+                  <Switch>
+                    <Match when={item.level === "log"}>
+                      <Badge colorScheme="success">log</Badge>
+                      <Show when={!!item.status}>
+                        <Badge colorScheme="info">{item.status}</Badge>
+                      </Show>
+                      <Text noOfLines={openLog(i()) ? Infinity : 2}>
+                        {item.text}
+                      </Text>
+                    </Match>
+                    <Match when={item.level === "error"}>
+                      <Badge colorScheme="danger">err</Badge>
+                      <Text>
+                        {item.text}
+                      </Text>
+                    </Match>
+                  </Switch>
+                </li>
+              )}
             </For>
           </ul>
         </Show>

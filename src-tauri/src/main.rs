@@ -3,10 +3,27 @@
     windows_subsystem = "windows"
 )]
 
+use serde::Serialize;
+
+#[derive(Serialize)]
+struct PingResponse {
+    status: String,
+    text: String,
+}
+
+impl PingResponse {
+    fn new(status: String, text: String) -> Self {
+        PingResponse { status, text }
+    }
+}
+
 #[tauri::command]
-fn client_ping(url: &str) -> Result<String, String> {
+fn client_ping(url: &str) -> Result<PingResponse, String> {
     let response = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
-    response.text().map_err(|e| e.to_string())
+
+    let status = response.status().to_string();
+    let text = response.text().map_err(|e| e.to_string())?;
+    Ok(PingResponse::new(status, text))
 }
 
 fn main() {

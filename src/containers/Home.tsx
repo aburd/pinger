@@ -1,9 +1,9 @@
-import {invoke} from "@tauri-apps/api/tauri";
 import {createSignal, For, Show} from "solid-js";
 import {createStore} from "solid-js/store";
 import {Grid, GridItem, Divider, Heading, Button} from "@hope-ui/solid"
 import PingDetails from '../components/PingDetails'
 import PingResults from '../components/PingResults'
+import * as api from '../api'
 import {UrlItem, PingResult} from '../types';
 
 function Home() {
@@ -19,12 +19,9 @@ function Home() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
     const selected = currentUrl();
     if (!selected) return;
-    try {
-      const ping = await invoke("client_ping", {url: selected?.url})
-      setPingMsgs([{text: String(ping), level: "log"}, ...pingResults]);
-    } catch (e) {
-      setPingMsgs([{text: String(e), level: "error"}, ...pingResults]);
-    }
+
+    const res = await api.ping.ping(selected.url); 
+    setPingMsgs([res, ...pingResults]);
   }
 
   function handleUrlClick(url: UrlItem) {

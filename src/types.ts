@@ -6,6 +6,8 @@ export type UrlItem = {
 }
 
 export interface PingResult {
+  status?: string;
   text: string;
   level: "log" | "error";
 }
+

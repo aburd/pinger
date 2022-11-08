@@ -1,36 +1,35 @@
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::default::Default;
-use std::fs::{self, File};
+use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Config {
     path: PathBuf,
-    app_dir: PathBuf,
+    pub app_dir: PathBuf,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Config {
-            path: CONFIG_PATH.into(),
-            app_dir: DEFAULT_APP_DIR.into(),
+            path: default_config_path(),
+            app_dir: default_app_dir(),
         }
     }
 }
 
-static CONFIG_PATH: &str = "$HOME/.pingerrc";
-static DEFAULT_APP_DIR: &str = "$HOME/.config/pinger";
+fn default_app_dir() -> PathBuf {
+    let home_dir = home::home_dir().unwrap();
+    home_dir.join(".config/pinger")
+}
+fn default_config_path() -> PathBuf {
+    let app_dir = default_app_dir();
+    app_dir.join(".pingerrc")
+}
 
 impl Config {
-    pub fn new(app_dir: String) -> Self {
-        Config {
-            path: CONFIG_PATH.into(),
-            app_dir: app_dir.into(),
-        }
-    }
-
     pub fn load() -> Result<Config, String> {
         let mut buf = String::new();
         let mut f: File = Config::load_config_file()?;
@@ -41,28 +40,35 @@ impl Config {
     }
 
     fn load_config_file() -> Result<File, String> {
-        File::open(CONFIG_PATH).or_else(|e| {
-            eprintln!("Config file not found: {}.", e);
-            Config::create_init_file()
-        })
+        println!("directory: {:?}", default_config_path());
+        OpenOptions::new()
+            .read(true)
+            .open(default_config_path())
+            .or_else(|e| {
+                eprintln!("Config file not found: {}.", e);
+                Config::create_init_file()
+            })
     }
 
     fn create_init_file() -> Result<File, String> {
         let c = Config::default();
-        let f = File::create(&c.path).unwrap();
         fs::create_dir_all(&c.app_dir).unwrap();
 
-        c.save()?;
+        let f = c.save()?;
         Ok(f)
     }
 }
 
 impl Config {
-    pub fn save(&self) -> Result<(), String> {
-        let mut f = File::open(&self.path).map_err(|e| e.to_string())?;
+    pub fn save(&self) -> Result<File, String> {
+        let mut f = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .open(&self.path)
+            .map_err(|e| e.to_string())?;
         let s = serde_json::to_string(self).unwrap();
-        f.write(s.as_bytes()).unwrap();
-        Ok(())
+        f.write_all(s.as_bytes()).unwrap();
+        Ok(f)
     }
 }
 

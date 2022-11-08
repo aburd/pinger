@@ -5,6 +5,7 @@ import PingDetails from '../components/PingDetails'
 import PingResults from '../components/PingResults'
 import PingList from '../components/PingList'
 import * as api from '../api'
+import * as notifications from '../notifications'
 import {UrlItem, PingResult} from '../types';
 
 let intervalRef: NodeJS.Timer | null = null;
@@ -19,23 +20,29 @@ function Home() {
     return urls.find(u => u.id === url());
   }
 
-  async function ping() {
+  async function ping(): Promise<PingResult | null> {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
     const selected = currentUrl();
-    if (!selected) return;
+    if (!selected) return null;
 
     const res = await api.ping.ping(selected.url);
     setPingMsgs([res, ...pingResults]);
+    return res;
   }
 
   function pingRepeat() {
     const selected = currentUrl();
     if (!selected) return;
+    let notify = selected.notifySuccess;
 
     setTimeoutMs(selected.timeoutM * 60 * 1000);
-    intervalRef = setInterval(() => {
-      ping();
+    intervalRef = setInterval(async () => {
       setTimeoutMs(timeoutMs() - selected.intervalMs);
+      const res = await ping();
+      if (res?.level === "log" && notify) {
+        notifications.notify("Ping Successful", `Status: ${res.status}\nURL: ${res.url}`)
+        notify = false;
+      }
     }, selected.intervalMs);
   }
 
@@ -58,6 +65,7 @@ function Home() {
       url: "https://",
       intervalMs: 1000,
       timeoutM: 0.1,
+      notifySuccess: false,
     }
     setUrls([
       ...urls,

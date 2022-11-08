@@ -4,6 +4,7 @@ export type UrlItem = {
   url: string;
   intervalMs: number;
   timeoutM: number;
+  notifySuccess: boolean;
 }
 
 export interface PingResult {

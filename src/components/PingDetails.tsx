@@ -1,5 +1,5 @@
 import {createSignal, Show} from "solid-js"
-import {Text, Heading, Button, FormControl, FormLabel, Input, FormHelperText} from "@hope-ui/solid"
+import {Checkbox, Text, Heading, Button, FormControl, FormLabel, Input, FormHelperText} from "@hope-ui/solid"
 import {UrlItem} from '../types'
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 }
 
 function PingDetails(props: Props) {
-  const [nowDate, setNowDate] = createSignal(new Date(), { equals: false });
+  const [nowDate, setNowDate] = createSignal(new Date(), {equals: false});
   function addDate(deltaMs: number) {
     const now = new Date();
     return new Date(now.valueOf() + deltaMs);
@@ -58,6 +58,17 @@ function PingDetails(props: Props) {
               value={props.url.timeoutM}
             />
             <FormHelperText>{"How long to ping for in minutes"}</FormHelperText>
+          </FormControl>
+          <FormControl>
+            <Checkbox
+              id="notifySuccess"
+              onchange={() => {
+                props.onChange({...props.url, notifySuccess: !props.url.notifySuccess})
+              }}
+              checked={props.url.notifySuccess}
+            />
+            <FormLabel for="notifySuccess">Notify</FormLabel><br />
+            <FormHelperText>{"Will notify you when the ping was successful"}</FormHelperText>
           </FormControl>
           <Text>This will ping until {nowDate().toLocaleTimeString()}</Text>
           <Button type="button" onClick={() => props.onSubmitPingRepeat()}>

@@ -9,7 +9,7 @@ interface PingResponse {
 
 export async function ping(url: string): Promise<PingResult> {
   try {
-    let res = await invoke<PingResponse>("client_ping", {url});
+    let res = await invoke<PingResponse>("ping_client", {url});
     return {
       ...res,
       level: "log",
@@ -17,7 +17,6 @@ export async function ping(url: string): Promise<PingResult> {
   } catch (e) {
     return {
       text: (e as Error).toString(),
-      url: null, 
       level: "error",
     }
   }

@@ -2,3 +2,7 @@
   height: 100vh;
   width: 100vw;
 }
+
+.page > div {
+  overflow-y: scroll;
+}

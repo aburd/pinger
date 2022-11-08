@@ -62,15 +62,13 @@ function PingDetails(props: Props) {
           <FormControl>
             <Checkbox
               id="notifySuccess"
-              onchange={() => {
-                props.onChange({...props.url, notifySuccess: !props.url.notifySuccess})
-              }}
+              onchange={() => props.onChange({...props.url, notifySuccess: !props.url.notifySuccess})}
               checked={props.url.notifySuccess}
             />
             <FormLabel for="notifySuccess">Notify</FormLabel><br />
-            <FormHelperText>{"Will notify you when the ping was successful"}</FormHelperText>
+            <FormHelperText>{"When checked, successful ping will broadcast a notification"}</FormHelperText>
           </FormControl>
-          <Text>This will ping until {nowDate().toLocaleTimeString()}</Text>
+          <Text>Will ping until {nowDate().toLocaleTimeString()}</Text>
           <Button type="button" onClick={() => props.onSubmitPingRepeat()}>
             Ping Repeat
           </Button>

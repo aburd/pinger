@@ -34,7 +34,7 @@ impl PingItem {
 }
 
 #[tauri::command]
-pub fn client_ping(url: &str) -> Result<PingResponse, String> {
+pub fn ping_client(url: &str) -> Result<PingResponse, String> {
     let response = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
 
     let status = response.status().to_string();
@@ -44,11 +44,11 @@ pub fn client_ping(url: &str) -> Result<PingResponse, String> {
 }
 
 #[tauri::command]
-pub fn pings_update() -> Result<(), String> {
+pub fn update() -> Result<(), String> {
     unimplemented!("update ping items")
 }
 
 #[tauri::command]
-pub fn pings_get() -> Result<(), String> {
+pub fn get() -> Result<(), String> {
     unimplemented!("get ping items")
 }

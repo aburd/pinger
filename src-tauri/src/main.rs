@@ -8,7 +8,7 @@ mod ping;
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![ping::client_ping])
+        .invoke_handler(tauri::generate_handler![ping::ping_client])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

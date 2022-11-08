@@ -6,39 +6,39 @@ import PingResults from '../components/PingResults'
 import PingList from '../components/PingList'
 import * as api from '../api'
 import * as notifications from '../notifications'
-import {UrlItem, PingResult} from '../types';
+import {PingItem, PingResult} from '../types';
 
 let intervalRef: NodeJS.Timer | null = null;
 
 function Home() {
   const [pingResults, setPingMsgs] = createStore<PingResult[]>([]);
   const [timeoutMs, setTimeoutMs] = createSignal<number>(0);
-  const [url, setUrl] = createSignal<number | null>(null);
-  const [urls, setUrls] = createStore<UrlItem[]>([]);
+  const [ping, setPingItem] = createSignal<number | null>(null);
+  const [pings, setPingItems] = createStore<PingItem[]>([]);
 
-  function currentUrl() {
-    return urls.find(u => u.id === url());
+  function currentPing() {
+    return pings.find(u => u.id === ping());
   }
 
-  async function ping(): Promise<PingResult | null> {
+  async function clientPing(): Promise<PingResult | null> {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    const selected = currentUrl();
+    const selected = currentPing();
     if (!selected) return null;
 
-    const res = await api.ping.ping(selected.url);
+    const res = await api.ping.launchPing(selected.url);
     setPingMsgs([res, ...pingResults]);
     return res;
   }
 
   function pingRepeat() {
-    const selected = currentUrl();
+    const selected = currentPing();
     if (!selected) return;
     let notify = selected.notifySuccess;
 
     setTimeoutMs(selected.timeoutM * 60 * 1000);
     intervalRef = setInterval(async () => {
       setTimeoutMs(timeoutMs() - selected.intervalMs);
-      const res = await ping();
+      const res = await clientPing();
       if (res?.level === "log" && notify) {
         notifications.notify("Ping Successful", `Status: ${res.status}\nURL: ${res.url}`)
         notify = false;
@@ -52,31 +52,23 @@ function Home() {
     }
   });
 
-  function handleUrlClick(url: UrlItem) {
-    setUrl(url.id);
+  function handlePingClick(ping: PingItem) {
+    setPingItem(ping.id);
     setPingMsgs([]);
   }
 
-  function handleAddNewUrlItem() {
-    const id = urls.length + 1;
-    const item = {
-      id,
-      name: id.toString(),
-      url: "https://",
-      intervalMs: 1000,
-      timeoutM: 0.1,
-      notifySuccess: false,
-    }
-    setUrls([
-      ...urls,
+  async function handleAddNewPingItem() {
+    const item = await api.ping.createItem();
+    setPingItems([
+      ...pings,
       item,
     ]);
-    setUrl(item.id);
+    setPingItem(item.id);
     setPingMsgs([]);
   }
 
-  function handleUrlChange(url: UrlItem) {
-    setUrls(u => u.id == url.id, url);
+  function handlePingChange(ping: PingItem) {
+    setPingItems(u => u.id == ping.id, ping);
   }
 
   return (
@@ -91,23 +83,23 @@ function Home() {
       </GridItem>
       <GridItem rowSpan={9} colSpan={1} bg="tomato" padding="$2">
         <PingList 
-          pings={urls}
-          onAdd={handleAddNewUrlItem}
-          onClickItem={(ping) => handleUrlClick(ping)}
+          pings={pings}
+          onAdd={handleAddNewPingItem}
+          onClickItem={(ping) => handlePingClick(ping)}
         />
       </GridItem>
       <GridItem rowSpan={9} colSpan={2} bg="papayawhip" padding="$2">
-        <Show when={currentUrl()} fallback={<Heading>No URL selected</Heading>}>
+        <Show when={currentPing()} fallback={<Heading>No URL selected</Heading>}>
           <PingDetails
-            url={currentUrl() as UrlItem}
-            onChange={handleUrlChange}
+            url={currentPing() as PingItem}
+            onChange={handlePingChange}
             onSubmitPing={() => ping()}
             onSubmitPingRepeat={() => pingRepeat()}
           />
         </Show>
       </GridItem>
       <GridItem rowSpan={9} colSpan={2} bg="papayawhip" padding="$2">
-        <Show when={currentUrl()}>
+        <Show when={currentPing()}>
           <PingResults
             results={pingResults}
           />

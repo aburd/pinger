@@ -1,4 +1,4 @@
-export type UrlItem = {
+export type PingItem = {
   id: number;
   name: string;
   url: string;

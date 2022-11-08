@@ -1,12 +1,12 @@
 import {For} from "solid-js";
 import {VStack, Box, Heading, Button, Badge, Text} from "@hope-ui/solid"
-import {UrlItem} from '../types'
+import {PingItem} from '../types'
 import './PingList.css'
 
 interface Props {
-  pings: UrlItem[];
+  pings: PingItem[];
   onAdd: () => void;
-  onClickItem: (ping: UrlItem) => void;
+  onClickItem: (ping: PingItem) => void;
 }
 
 

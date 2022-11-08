@@ -1,10 +1,10 @@
 import {createSignal, Show} from "solid-js"
 import {Checkbox, Text, Heading, Button, FormControl, FormLabel, Input, FormHelperText} from "@hope-ui/solid"
-import {UrlItem} from '../types'
+import {PingItem} from '../types'
 
 interface Props {
-  url: UrlItem;
-  onChange: (item: UrlItem) => void;
+  url: PingItem;
+  onChange: (item: PingItem) => void;
   onSubmitPing: () => void;
   onSubmitPingRepeat: () => void;
 }

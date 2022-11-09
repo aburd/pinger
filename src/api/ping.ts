@@ -22,7 +22,7 @@ export async function launchPing(url: string): Promise<PingResult> {
   }
 }
 
-interface PingCreateResponse {
+interface PingItemBE {
   id: number,
   name: string,
   url: string,
@@ -30,14 +30,35 @@ interface PingCreateResponse {
   timeout_m: number,
 }
 
-export async function createItem(): Promise<PingItem> {
-  let res = await invoke<PingCreateResponse>("ping_new", {});
+function translateItem(s: PingItemBE): PingItem {
   return {
-    id: res.id,
-    name: res.name,
-    url: res.url,
-    intervalMs: res.interval_ms,
-    timeoutM: res.timeout_m,
+    id: s.id,
+    name: s.name,
+    url: s.url,
+    intervalMs: s.interval_ms,
+    timeoutM: s.timeout_m,
     notifySuccess: false,
   }
+}
+
+export async function createItem(): Promise<PingItem> {
+  const res = await invoke<PingItemBE>("ping_new", {});
+  return translateItem(res);
+}
+
+export async function getItmes(): Promise<PingItem[]> {
+  const res = await invoke<PingItemBE[]>("ping_get_all", {});
+  return res.map((i) => translateItem(i));
+}
+
+export async function updateItem(item: PingItem): Promise<void> {
+  const itemBE: PingItemBE = {
+    id: item.id,
+    name: item.name,
+    url: item.url,
+    interval_ms: item.intervalMs,
+    timeout_m: item.timeoutM,
+    // notifySuccess: false,
+  };
+  return invoke("ping_update", {ping: itemBE});
 }

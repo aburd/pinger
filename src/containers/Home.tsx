@@ -1,4 +1,4 @@
-import {createEffect, createSignal, Show} from "solid-js";
+import {createEffect, createSignal, createResource, Show} from "solid-js";
 import {createStore} from "solid-js/store";
 import {Grid, GridItem, Heading} from "@hope-ui/solid"
 import PingDetails from '../components/PingDetails'
@@ -14,10 +14,17 @@ function Home() {
   const [pingResults, setPingMsgs] = createStore<PingResult[]>([]);
   const [timeoutMs, setTimeoutMs] = createSignal<number>(0);
   const [ping, setPingItem] = createSignal<number | null>(null);
-  const [pings, setPingItems] = createStore<PingItem[]>([]);
+  const [pingItems, {mutate: setPingItems}] = createResource<PingItem[]>(api.ping.getItmes)
+
+  createEffect(() => {
+    console.log({
+      loading: pingItems.loading,
+      items: pingItems(),
+    })
+  });
 
   function currentPing() {
-    return pings.find(u => u.id === ping());
+    return (pingItems() || []).find(u => u.id === ping());
   }
 
   async function clientPing(): Promise<PingResult | null> {
@@ -60,7 +67,7 @@ function Home() {
   async function handleAddNewPingItem() {
     const item = await api.ping.createItem();
     setPingItems([
-      ...pings,
+      ...pingItems() || [],
       item,
     ]);
     setPingItem(item.id);
@@ -68,7 +75,15 @@ function Home() {
   }
 
   function handlePingChange(ping: PingItem) {
-    setPingItems(u => u.id == ping.id, ping);
+    try {
+      api.ping.updateItem(ping);
+      setPingItems(items => {
+        if (!items) return [];
+        return items.map(pingItem => pingItem.id == ping.id ? ping : pingItem)
+      });
+    } catch(e) {
+      console.error(e);
+    }
   }
 
   return (
@@ -82,18 +97,20 @@ function Home() {
         <Heading size="6xl">Pinger</Heading>
       </GridItem>
       <GridItem rowSpan={9} colSpan={1} bg="tomato" padding="$2">
-        <PingList 
-          pings={pings}
-          onAdd={handleAddNewPingItem}
-          onClickItem={(ping) => handlePingClick(ping)}
-        />
+        <Show when={!pingItems.loading} fallback={<div>Loading...</div>}>
+          <PingList
+            pings={pingItems() || []}
+            onAdd={handleAddNewPingItem}
+            onClickItem={(ping) => handlePingClick(ping)}
+          />
+        </Show>
       </GridItem>
       <GridItem rowSpan={9} colSpan={2} bg="papayawhip" padding="$2">
         <Show when={currentPing()} fallback={<Heading>No URL selected</Heading>}>
           <PingDetails
             url={currentPing() as PingItem}
             onChange={handlePingChange}
-            onSubmitPing={() => ping()}
+            onSubmitPing={() => clientPing()}
             onSubmitPingRepeat={() => pingRepeat()}
           />
         </Show>

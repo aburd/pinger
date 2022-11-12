@@ -2,6 +2,10 @@
   width: 100%;
   padding: 0.2rem;
   border-radius: 5px;
+  border: 1px solid rgba(0,0,0,0.5);
+}
+.ping-item:hover {
+  box-shadow: 2px 2px 2px rgba(0,0,0,0.5);
 }
 
 .PingList .controls {

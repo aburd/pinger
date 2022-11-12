@@ -3,14 +3,33 @@ import {VStack, Box, Heading, Button, Badge, Text} from "@hope-ui/solid"
 import {PingItem} from '../types'
 import './PingList.css'
 
-interface Props {
+interface PingListItemProps {
+  onClick: () => void;
+  bgColor: string;
+  name: string;
+  url: string;
+}
+function PingListItem(props: PingListItemProps) {
+  return (
+    <Box
+      class="ping-item"
+      onClick={() => props.onClick()} 
+      bg={props.bgColor}
+    >
+      <Badge variant="subtle" colorScheme="primary">{props.name}</Badge>
+      <Text size="xs">{props.url}</Text>
+    </Box>
+  )
+}
+
+
+interface PingListProps {
   pings: PingItem[];
   onAdd: () => void;
   onClickItem: (ping: PingItem) => void;
 }
 
-
-function PingList(props: Props) {
+function PingList(props: PingListProps) {
   const colors = ["tomato", "whitesmoke", "papayawhip"];
 
   return (
@@ -22,13 +41,12 @@ function PingList(props: Props) {
       <VStack spacing="$2">
         <For each={props.pings}>
           {(item, i) => (
-            <Box
-              class="ping-item"
-              onClick={() => props.onClickItem(item)} bg={colors[i() % colors.length]}
-            >
-              <Badge variant="subtle" colorScheme="primary">{item.name}</Badge>
-              <Text size="xs">{item.url}</Text>
-            </Box>
+            <PingListItem
+              onClick={() => props.onClickItem(item)} 
+              bgColor={colors[i() % colors.length]}
+              name={item.name}
+              url={item.url}
+            />
           )}
         </For>
       </VStack>

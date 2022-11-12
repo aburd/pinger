@@ -40,7 +40,6 @@ impl Config {
     }
 
     fn load_config_file() -> Result<File, String> {
-        println!("directory: {:?}", default_config_path());
         OpenOptions::new()
             .read(true)
             .open(default_config_path())

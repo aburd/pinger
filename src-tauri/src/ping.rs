@@ -83,7 +83,6 @@ impl PingItem {
 
     pub fn add_one(config: &Config) -> Result<PingItem, String> {
         let mut items: Vec<_> = PingItem::load_all(config)?;
-        println!("got items: {:?}", items);
         let ping_item = PingItem::new(items.len());
         items.push(ping_item.clone());
         PingItem::write_all(&items)?;
